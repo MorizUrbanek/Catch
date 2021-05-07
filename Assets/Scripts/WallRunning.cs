@@ -9,12 +9,16 @@ public class WallRunning : MonoBehaviour
     public float minimumJumpHeight = 1.5f;
     public float wallRunGravity = 1;
     public float wallJumpForce = 6;
+    public float wallFrontJumpForce = 2.5f;
 
     bool isWallLeft;
     bool isWallRight;
+    bool isWallFront;
+    bool isWallrunning = false;
 
     RaycastHit leftWallHit;
     RaycastHit rightWallHit;
+    RaycastHit frontWallHit;
 
     Rigidbody rb;
     public LayerMask walllayer;
@@ -30,18 +34,24 @@ public class WallRunning : MonoBehaviour
 
         if (CanWallRun())
         {
-            if (isWallLeft || isWallRight)
+            if (isWallLeft || isWallRight || isWallFront)
             {
                 StartWallRun();
             }
             else
             {
-                StopWallRun();
+                if (isWallrunning)
+                {
+                    StopWallRun();
+                }
             }
         }
         else
         {
-            StopWallRun();
+            if (isWallrunning)
+            {
+                StopWallRun();
+            }
         }
     }
 
@@ -49,6 +59,7 @@ public class WallRunning : MonoBehaviour
     {
         isWallLeft = Physics.Raycast(transform.position, -transform.right, out leftWallHit, wallDistance, walllayer);
         isWallRight = Physics.Raycast(transform.position, transform.right, out rightWallHit, wallDistance, walllayer);
+        isWallFront = Physics.Raycast(transform.position, transform.forward, out frontWallHit, wallDistance, walllayer);
     }
 
     bool CanWallRun()
@@ -58,31 +69,44 @@ public class WallRunning : MonoBehaviour
 
     void StartWallRun()
     {
+        if (!isWallrunning && isWallFront && rb.velocity.y > 1)
+        {
+            rb.AddForce((transform.up + transform.forward / 5) * wallFrontJumpForce * 100, ForceMode.Force);
+        }
+
+        if (!isWallrunning)
+        {
+            isWallrunning = true;
+        }
         rb.useGravity = false;
         rb.AddForce(Vector3.down * wallRunGravity, ForceMode.Force);
 
-        Debug.Log("Is wallrunning");
-
         if (Input.GetButtonDown("Jump"))
         {
+            Vector3 wallRunJumpDirection = Vector3.zero;
+            rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
             if (isWallLeft)
             {
-                Vector3 wallRunJumpDirection = transform.up/2 + leftWallHit.normal;
-                rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+                wallRunJumpDirection = transform.up/2 + leftWallHit.normal;
                 rb.AddForce(wallRunJumpDirection * wallJumpForce * 100, ForceMode.Force);
             }
             else if (isWallRight)
             {
-                Vector3 wallRunJumpDirection = transform.up/2 + rightWallHit.normal;
-                rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+                wallRunJumpDirection = transform.up/2 + rightWallHit.normal;
                 rb.AddForce(wallRunJumpDirection * wallJumpForce * 100, ForceMode.Force);
             }
+            else if (isWallFront)
+            {
+                wallRunJumpDirection = transform.up / 2 + frontWallHit.normal;
+                rb.AddForce(wallRunJumpDirection * wallJumpForce * 100, ForceMode.Force);
+            }
+            
         }
     }
 
     void StopWallRun()
     {
-        Debug.Log("Stop wallrun");
+        isWallrunning = false;
         rb.useGravity = true;
     }
 }

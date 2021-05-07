@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
     public float airMultiplier = 0.4f;
     Vector3 moveDirection;
     Vector3 slopeDirection;
+
     float horizontalMovement;
     float verticalMovement;
 
@@ -45,8 +46,9 @@ public class PlayerMovement : MonoBehaviour
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
 
         MyInput();
-        ControlDrag();
         ControlSpeed();
+        ControlDrag();
+
 
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
@@ -74,7 +76,6 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.drag = airDrag;
         }
-        
     }
 
     void Jump()
@@ -98,6 +99,10 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         MovePlayer();
+        if (rb.useGravity)
+        {
+            rb.AddForce(Physics.gravity * rb.mass);
+        }
     }
 
     void MovePlayer()
@@ -122,7 +127,6 @@ public class PlayerMovement : MonoBehaviour
         {
             if (slopeHit.normal != Vector3.up)
             {
-                Debug.Log("onslope");
                 return true;
             }
         }
