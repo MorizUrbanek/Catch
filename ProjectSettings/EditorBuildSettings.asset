@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/CatchRoom.unity
+    guid: cc85d8c42aacd8f4aaaa6c6d29ec16e2
   m_configObjects: {}

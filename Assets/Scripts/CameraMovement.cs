@@ -5,8 +5,10 @@ using UnityEngine;
 public class CameraMovement : MonoBehaviour
 {
     public float rotationSpeed = 1;
-    public Transform target, player;
+    public Transform direction, body;
+    public Gun gun;
     float mouseX, mouseY;
+    
 
     private void Start()
     {
@@ -24,9 +26,12 @@ public class CameraMovement : MonoBehaviour
         mouseY -= Input.GetAxis("Mouse Y") * rotationSpeed;
         mouseY = Mathf.Clamp(mouseY, -35, 60);
 
-        transform.LookAt(target);
+        transform.rotation = Quaternion.Euler(mouseY, mouseX, 0);
+        if (gun.isAiming)
+        {
+            body.rotation = Quaternion.Euler(0, mouseX, 0);
+        }
 
-        target.rotation = Quaternion.Euler(mouseY, mouseX, 0);
-        player.rotation = Quaternion.Euler(0, mouseX, 0);
+        direction.rotation = Quaternion.Euler(0, mouseX, 0);
     }
 }
