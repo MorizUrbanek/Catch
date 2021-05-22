@@ -40,7 +40,7 @@ public class PlayerMovement : MonoBehaviour
     public Transform groundCheck;
     public LayerMask groundMask;
     bool isGrounded;
-    float groundDistance = 0.3F;
+    float groundDistance = 0.4F;
 
     [Header("Direction (Playermodle)")]
     public Transform body;
@@ -56,7 +56,7 @@ public class PlayerMovement : MonoBehaviour
     #region Wallrun Variablen
     [Header("Wall Running")]
     public float wallDistance = .6f;
-    public float minimumJumpHeight = 1.5f;
+    public float minimumJumpHeight = 1.3f;
     public float wallRunGravity = 4.8f;
     public float wallJumpForce = 6;
     public float wallFrontJumpForce = 4f;
@@ -64,6 +64,7 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask walllayer;
     public Transform ledgeUpCheck;
     public Transform ledgeLevelCheck;
+    public Transform wallCheck;
 
     bool isWallLeft;
     bool isWallRight;
@@ -90,7 +91,10 @@ public class PlayerMovement : MonoBehaviour
         MyInput();
         ControlSpeed();
         ControlDrag();
-        WallRun();
+        if (!isSliding)
+        {
+            WallRun();
+        }
 
         if (Input.GetButtonDown("Jump") && isGrounded && !isSliding)
         {
@@ -105,6 +109,10 @@ public class PlayerMovement : MonoBehaviour
         {
             gun.SetIsAiming(!gun.isAiming);
             body.rotation = direction.rotation;
+            //if (!gun.isAiming)
+            //{
+            //    gun.isPulling = false;
+            //}
         }
 
         //if (Input.GetKey(KeyCode.Mouse1))
@@ -133,7 +141,7 @@ public class PlayerMovement : MonoBehaviour
     void StartSliding()
     {
         isSliding = true;
-        body.Rotate(new Vector3(-80, 0, 0));
+        body.rotation = Quaternion.Euler(-80, 0, 0);
         slidingDirection = moveDirection;
         Invoke("EndSliding", slideTime);
     }
@@ -141,7 +149,7 @@ public class PlayerMovement : MonoBehaviour
     void EndSliding()
     {
         isSliding = false;
-        body.Rotate(new Vector3(80, 0, 0));
+        body.rotation = Quaternion.Euler(0, 0, 0);
     }
     #endregion
 
@@ -189,8 +197,7 @@ public class PlayerMovement : MonoBehaviour
     void WallRun()
     {
         CheckWall();
-
-        if (CanWallRun() && !gun.isPulling)
+        if (CanWallRun() && !gun.isPulling && !OnSlope())
         {
             if (isWallLeft || isWallRight || isWallFront || isWallBack)
             {
@@ -212,7 +219,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        if (CheckForClimableLedge() && !climbingLedge)
+        if (CheckForClimableLedge() && !climbingLedge && isWallrunning)
         {
             if (Physics.Raycast(ledgeLevelCheck.position, Vector3.down, wallDistance * 5, walllayer))
             {
@@ -226,11 +233,12 @@ public class PlayerMovement : MonoBehaviour
         {
             if (isWallFront)
             {
-                rb.AddForce(body.up * 6 + body.forward * 2f, ForceMode.Force);
+                rb.AddForce(body.up * 15 + body.forward * 2f, ForceMode.Force);
             }
             else
             {
                 rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y / 20, rb.velocity.z);
+                rb.AddForce(body.up + body.forward, ForceMode.Impulse);
                 climbingLedge = false;
             }
         }
@@ -238,11 +246,10 @@ public class PlayerMovement : MonoBehaviour
 
     void CheckWall()
     {
-        isWallLeft = Physics.BoxCast(transform.position, new Vector3(0.1f, 2f, 0.1f), -body.right, out leftWallHit, transform.rotation, wallDistance, walllayer);
-        isWallRight = Physics.BoxCast(transform.position, new Vector3(0.1f, 2f, 0.1f), body.right, out rightWallHit, transform.rotation, wallDistance, walllayer);
-        isWallFront = Physics.BoxCast(transform.position, new Vector3(0.1f, 2f, 0.1f), body.forward, out frontWallHit, transform.rotation, wallDistance, walllayer);
-        isWallBack = Physics.BoxCast(transform.position, new Vector3(0.1f, 2f, 0.1f), -body.forward, out backWallHit, transform.rotation, wallDistance, walllayer);
-
+        isWallLeft = Physics.BoxCast(wallCheck.position, new Vector3(0.1f, 0.7f, 0.1f), -body.right, out leftWallHit, body.rotation, wallDistance, walllayer);
+        isWallRight = Physics.BoxCast(wallCheck.position, new Vector3(0.1f, 0.7f, 0.1f), body.right, out rightWallHit, body.rotation, wallDistance, walllayer);
+        isWallFront = Physics.BoxCast(body.position, new Vector3(0.1f, 0.99f, 0.1f), body.forward, out frontWallHit, body.rotation, wallDistance, walllayer);
+        isWallBack = Physics.BoxCast(wallCheck.position, new Vector3(0.1f, 0.7f, 0.1f), -body.forward, out backWallHit, body.rotation, wallDistance, walllayer);
     }
 
     bool CanWallRun()
@@ -278,11 +285,14 @@ public class PlayerMovement : MonoBehaviour
             }
             else if (isWallFront)
             {
-                wallRunJumpDirection = body.up / 2 + frontWallHit.normal;
+                wallRunJumpDirection = body.up + frontWallHit.normal;
+                rb.velocity = Vector3.zero;
+                body.rotation = Quaternion.LookRotation(frontWallHit.normal);
             }
             else if (isWallBack)
             {
-                wallRunJumpDirection = body.up / 2 + backWallHit.normal;
+                wallRunJumpDirection = body.up + backWallHit.normal;
+                rb.velocity = Vector3.zero;
             }
             rb.AddForce(wallRunJumpDirection * wallJumpForce * 100, ForceMode.Force);
         }
@@ -298,8 +308,9 @@ public class PlayerMovement : MonoBehaviour
     bool CheckForClimableLedge()
     {
         bool ledgeCheckUp = Physics.Raycast(ledgeUpCheck.position, body.forward, wallDistance, walllayer);
+        bool ledgeCheckUp2 = Physics.Raycast(body.position, body.up, wallDistance * 3, walllayer);
 
-        if (isWallFront && !ledgeCheckUp)
+        if (isWallFront && !ledgeCheckUp && !ledgeCheckUp2)
         {
             return true;
         }
@@ -350,6 +361,11 @@ public class PlayerMovement : MonoBehaviour
             bodyRotation = Quaternion.LookRotation(currentDirection);
             body.rotation = Quaternion.Euler(body.rotation.eulerAngles.x, bodyRotation.eulerAngles.y, body.rotation.eulerAngles.z);
         }
+        //if (rb.velocity != Vector3.zero && !gun.isAiming && !isWallrunning && !isWallFront)
+        //{
+        //    bodyRotation = Quaternion.LookRotation(rb.velocity);
+        //    body.rotation = Quaternion.Euler(body.rotation.eulerAngles.x, bodyRotation.eulerAngles.y, body.rotation.eulerAngles.z);
+        //}
         GunPull();
     }
 
@@ -382,7 +398,7 @@ public class PlayerMovement : MonoBehaviour
 
     private bool OnSlope()
     {
-        if (Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerheight / 2 + 0.5f))
+        if (Physics.Raycast(transform.position, Vector3.down, out slopeHit, playerheight / 2 + 1f))
         {
             if (slopeHit.normal != Vector3.up)
             {
@@ -390,5 +406,52 @@ public class PlayerMovement : MonoBehaviour
             }
         }
         return false;
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (isWallLeft)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(wallCheck.position + -body.right * wallDistance, new Vector3(0.2f,1.4f, 0.2f));
+        }
+        else
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireCube(wallCheck.position + -body.right * wallDistance, new Vector3(0.2f,1.4f, 0.2f));
+        }
+
+        if (isWallRight)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(wallCheck.position + body.right * wallDistance, new Vector3(0.2f,1.4f, 0.2f));
+        }
+        else
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireCube(wallCheck.position + body.right * wallDistance, new Vector3(0.2f,1.4f, 0.2f));
+        }
+
+        if (isWallFront)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(body.position + body.forward * wallDistance, new Vector3(0.2f, 2f, 0.2f));
+        }
+        else
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireCube(body.position + body.forward * wallDistance, new Vector3(0.2f, 2f, 0.2f));
+        }
+
+        if (isWallBack)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(wallCheck.position + -body.forward * wallDistance, new Vector3(0.2f,1.4f, 0.2f));
+        }
+        else
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireCube(wallCheck.position + -body.forward * wallDistance, new Vector3(0.2f,1.4f, 0.2f));
+        }
     }
 }
