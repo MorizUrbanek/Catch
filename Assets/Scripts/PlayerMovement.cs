@@ -38,8 +38,10 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("GroundCheck")]
     public Transform groundCheck;
+    public Transform headCheck;
     public LayerMask groundMask;
     bool isGrounded;
+    bool isHeadOnwall;
     float groundDistance = 0.4F;
 
     [Header("Direction (Playermodle)")]
@@ -87,6 +89,7 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        isHeadOnwall = Physics.CheckSphere(headCheck.position, groundDistance, groundMask);
 
         MyInput();
         ControlSpeed();
@@ -219,7 +222,7 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
-        if (CheckForClimableLedge() && !climbingLedge && isWallrunning)
+        if (CheckForClimableLedge() && !climbingLedge && isWallrunning && !isGrounded)
         {
             if (Physics.Raycast(ledgeLevelCheck.position, Vector3.down, wallDistance * 5, walllayer))
             {
@@ -233,12 +236,12 @@ public class PlayerMovement : MonoBehaviour
         {
             if (isWallFront)
             {
-                rb.AddForce(body.up * 15 + body.forward * 2f, ForceMode.Force);
+                rb.AddForce(body.up * 15 + body.forward, ForceMode.Force);
             }
             else
             {
                 rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y / 20, rb.velocity.z);
-                rb.AddForce(body.up + body.forward, ForceMode.Impulse);
+                rb.AddForce(body.up * 2 + body.forward * 4, ForceMode.Impulse);
                 climbingLedge = false;
             }
         }
@@ -248,7 +251,7 @@ public class PlayerMovement : MonoBehaviour
     {
         isWallLeft = Physics.BoxCast(wallCheck.position, new Vector3(0.1f, 0.7f, 0.1f), -body.right, out leftWallHit, body.rotation, wallDistance, walllayer);
         isWallRight = Physics.BoxCast(wallCheck.position, new Vector3(0.1f, 0.7f, 0.1f), body.right, out rightWallHit, body.rotation, wallDistance, walllayer);
-        isWallFront = Physics.BoxCast(body.position, new Vector3(0.1f, 0.99f, 0.1f), body.forward, out frontWallHit, body.rotation, wallDistance, walllayer);
+        isWallFront = Physics.BoxCast(body.position, new Vector3(0.1f, 0.95f, 0.1f), body.forward, out frontWallHit, body.rotation, wallDistance, walllayer);
         isWallBack = Physics.BoxCast(wallCheck.position, new Vector3(0.1f, 0.7f, 0.1f), -body.forward, out backWallHit, body.rotation, wallDistance, walllayer);
     }
 
@@ -325,6 +328,12 @@ public class PlayerMovement : MonoBehaviour
     {
         if (gun.isPulling)
         {
+            if (isWallFront || isHeadOnwall)
+            {
+                gun.isPulling = false;
+                rb.useGravity = true;
+                return;
+            }
             if (rb.useGravity){rb.useGravity = false;} 
             rb.velocity = Vector3.zero;
             Vector3 hookShotDirection = (gun.pullPoint - transform.position).normalized;
@@ -337,7 +346,7 @@ public class PlayerMovement : MonoBehaviour
 
             if (Vector3.Distance(transform.position, gun.pullPoint) < reachedHookShotPositionDistance
                 || Vector3.Distance(groundCheck.position, gun.pullPoint) < reachedHookShotPositionDistance
-                || Vector3.Distance(new Vector3(transform.position.x, transform.position.y + 2f, transform.position.z), gun.pullPoint) < reachedHookShotPositionDistance
+                || Vector3.Distance(new Vector3(transform.position.x, transform.position.y + 1.5f, transform.position.z), gun.pullPoint) < reachedHookShotPositionDistance
                 || isWallFront)
             {
                 gun.isPulling = false;
@@ -435,12 +444,12 @@ public class PlayerMovement : MonoBehaviour
         if (isWallFront)
         {
             Gizmos.color = Color.green;
-            Gizmos.DrawWireCube(body.position + body.forward * wallDistance, new Vector3(0.2f, 2f, 0.2f));
+            Gizmos.DrawWireCube(body.position + body.forward * wallDistance, new Vector3(0.2f, 0.95f * 2, 0.2f));
         }
         else
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireCube(body.position + body.forward * wallDistance, new Vector3(0.2f, 2f, 0.2f));
+            Gizmos.DrawWireCube(body.position + body.forward * wallDistance, new Vector3(0.2f, 0.95f * 2, 0.2f));
         }
 
         if (isWallBack)
