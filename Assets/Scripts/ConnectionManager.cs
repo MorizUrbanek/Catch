@@ -9,7 +9,7 @@ public class ConnectionManager : MonoBehaviour
 {
     public GameObject connectionButtonPanel;
     private int playerCount;
-    //PlayerData player;
+    PlayerData player;
 
     public void Host()
     {
@@ -26,12 +26,12 @@ public class ConnectionManager : MonoBehaviour
         if (approve)
         {
             playerCount = NetworkManager.Singleton.ConnectedClients.Count;
-            //player = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject.GetComponent<PlayerData>();
+            player = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject.GetComponent<PlayerData>();
 
-            //if (player != null)
-            //{
-            //    player.catcherId = playerCount - 1;
-            //}
+            if (player != null)
+            {
+                player.catcherId = playerCount - 1;
+            }
         }
     }
 

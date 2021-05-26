@@ -14,13 +14,8 @@ public class CatchPlayerCheck : NetworkBehaviour
     public LayerMask layerMask;
     private Vector3 origin;
 
-    NetworkVariableInt catchedPlayerId = new NetworkVariableInt(0);
-    private int playerId;
-
-    NetworkVariableFloat catchTime = new NetworkVariableFloat(0);
-
-    private const int PLAYER_COUNT = 6;
-    private float[] playerTimes = new float[PLAYER_COUNT];
+    private Timer timer = Timer.GetInstance();
+    
 
     private void Start()
     {
