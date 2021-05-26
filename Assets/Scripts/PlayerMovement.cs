@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MLAPI;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
     #region Movement Variablen
     [Header("Movement")]
@@ -87,6 +89,14 @@ public class PlayerMovement : MonoBehaviour
     }
 
     private void Update()
+    {
+        if (IsLocalPlayer)
+        {
+            Move();
+        }
+    }
+
+    private void Move()
     {
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
         isHeadOnwall = Physics.CheckSphere(headCheck.position, groundDistance, groundMask);
