@@ -32,6 +32,8 @@ public class PlayerMovement : NetworkBehaviour
     [Header("Sliding")]
     float slideTime = .5f;
     bool isSliding = false;
+    float slidingCooldown = 3f;
+    float slidingCooldownendtime = 0;
     Vector3 slidingDirection;
 
     [Header("Drag")]
@@ -113,7 +115,7 @@ public class PlayerMovement : NetworkBehaviour
         {
             Jump();
         }
-        if (Input.GetButtonDown("Slide") && isGrounded && (Mathf.Abs(rb.velocity.x) > 1 || Mathf.Abs(rb.velocity.z) > 1) && !isSliding && !OnSlope() && !gun.isAiming)
+        if (Input.GetButtonDown("Slide") && isGrounded && (Mathf.Abs(rb.velocity.x) > 1 || Mathf.Abs(rb.velocity.z) > 1) && !isSliding && !OnSlope() && !gun.isAiming && Time.time > slidingCooldownendtime)
         {
             StartSliding();
         }
@@ -157,6 +159,7 @@ public class PlayerMovement : NetworkBehaviour
 
     void EndSliding()
     {
+        slidingCooldownendtime += slidingCooldown;
         isSliding = false;
         body.rotation = Quaternion.Euler(0, 0, 0);
     }
