@@ -14,13 +14,9 @@ public class CatchPlayerCheck : NetworkBehaviour
     public LayerMask layerMask;
     private Vector3 origin;
 
-    NetworkVariableInt catchedPlayerId = new NetworkVariableInt(0);
-    private int playerId;
-
-    NetworkVariableFloat catchTime = new NetworkVariableFloat(0);
-
-    private const int PLAYER_COUNT = 6;
-    private float[] playerTimes = new float[PLAYER_COUNT];
+    //private Timer timer = Timer.GetInstance();
+    private CatchPlayer catchPlayer;
+    
 
     private void Start()
     {
@@ -29,6 +25,11 @@ public class CatchPlayerCheck : NetworkBehaviour
         if (IsHost && IsOwner)
         {
             SelectFirstCatcherServerRpc();
+        }
+
+        if (IsLocalPlayer)
+        {
+            catchPlayer = gameObject.GetComponent<CatchPlayer>();
         }
     }
 
@@ -45,8 +46,9 @@ public class CatchPlayerCheck : NetworkBehaviour
 
         if (IsLocalPlayer && IsOwner)
         {
-            if (Input.GetKeyDown(KeyCode.G))
+            if (Input.GetKeyDown(KeyCode.G) && catchPlayer.GetIsAttacker())
             {
+                Debug.Log("catched");
                 CatchPlayerServerRpc();
             }
         }
@@ -61,20 +63,20 @@ public class CatchPlayerCheck : NetworkBehaviour
         {
             if (catched.transform != transform)
             {
-                CatchCeck(catched);
+                if (CatchCeck(catched)) { return; }
             }
         }
     }
 
-    private void CatchCeck(Collider catched)
+    private bool CatchCeck(Collider catched)
     {
         var catchedPlayer = catched.transform.GetComponent<CatchPlayer>();
         if (catchedPlayer != null)
         {
-            Debug.Log("catched");
             catchedPlayer.Catched();
             gameObject.GetComponent<CatchPlayer>().Released();
-
+            return true;
         }
+        return false;
     }
 }
