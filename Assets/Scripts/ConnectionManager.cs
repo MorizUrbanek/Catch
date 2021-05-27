@@ -29,7 +29,6 @@ public class ConnectionManager : MonoBehaviour
 
             if (player != null)
             {
-                Debug.Log("Hallo");
                 player.catcherId.Value = playerCount - 1;
                 player.Test();
             }
