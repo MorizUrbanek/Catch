@@ -13,6 +13,11 @@ public class CatchPlayer : NetworkBehaviour
     public bool isActuallyAttacker = false;
     public MeshRenderer playerColor;
 
+    public bool GetIsAttacker()
+    {
+        return isActuallyAttacker;
+    }
+
     void Update()
     {
         isActuallyAttacker = isAttacker.Value;
@@ -29,11 +34,17 @@ public class CatchPlayer : NetworkBehaviour
 
     public void Catched()
     {
-        isAttacker.Value = true;
+        if(isActuallyAttacker == false)
+        {
+            isAttacker.Value = true;
+        }
     }
 
     public void Released()
     {
-        isAttacker.Value = false;
+        if (isActuallyAttacker)
+        {
+            isAttacker.Value = false;
+        }
     }
 }
