@@ -16,11 +16,13 @@ public class Gun : MonoBehaviour
     public Vector3 pullPoint;
 
     private float range = 100f;
+    private float fireCooldown = .5f;
+    private float fireCooldownend = 0;
 
     // Update is called once per frame
     void Update()
     {
-        if ((Input.GetButtonDown("Fire1") || Input.GetAxis("Fire1") > 0) && isAiming)
+        if ((Input.GetButtonDown("Fire1") || Input.GetAxis("Fire1") > 0) && isAiming && Time.time > fireCooldownend)
         {
             Shoot();
         }
@@ -28,6 +30,7 @@ public class Gun : MonoBehaviour
 
     void Shoot()
     {
+        fireCooldownend += fireCooldown;
         RaycastHit hit;
         Ray ray = rayCam.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit, range))
