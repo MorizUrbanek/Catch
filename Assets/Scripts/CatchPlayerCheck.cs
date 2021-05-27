@@ -16,6 +16,7 @@ public class CatchPlayerCheck : NetworkBehaviour
 
     //private Timer timer = Timer.GetInstance();
     private CatchPlayer catchPlayer;
+   // private Timer timerInstance;
     
 
     private void Start()
@@ -30,6 +31,7 @@ public class CatchPlayerCheck : NetworkBehaviour
         if (IsLocalPlayer)
         {
             catchPlayer = gameObject.GetComponent<CatchPlayer>();
+           // timerInstance = GameObject.Find("Timer").GetComponent<Timer>();
         }
     }
 
@@ -73,6 +75,9 @@ public class CatchPlayerCheck : NetworkBehaviour
         var catchedPlayer = catched.transform.GetComponent<CatchPlayer>();
         if (catchedPlayer != null)
         {
+            int id = catched.transform.GetComponent<PlayerData>().catcherId.Value;
+            Debug.Log(id);
+            Timer.SetCatcherId(id);
             catchedPlayer.Catched();
             gameObject.GetComponent<CatchPlayer>().Released();
             return true;

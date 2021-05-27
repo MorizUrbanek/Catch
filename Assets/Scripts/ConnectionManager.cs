@@ -16,7 +16,6 @@ public class ConnectionManager : MonoBehaviour
         connectionButtonPanel.SetActive(false);
         NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
         NetworkManager.Singleton.StartHost(GetRandomSpawn(), Quaternion.identity);
-        Debug.Log(NetworkManager.Singleton.ConnectedClients.Count);
     }
 
     private void ApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
@@ -26,11 +25,13 @@ public class ConnectionManager : MonoBehaviour
         if (approve)
         {
             playerCount = NetworkManager.Singleton.ConnectedClients.Count;
-            player = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject.GetComponent<PlayerData>();
+            player = NetworkManager.Singleton.ConnectedClients[clientId].PlayerObject.gameObject.GetComponentInChildren<PlayerData>();
 
             if (player != null)
             {
-                player.catcherId = playerCount - 1;
+                Debug.Log("Hallo");
+                player.catcherId.Value = playerCount - 1;
+                player.Test();
             }
         }
     }

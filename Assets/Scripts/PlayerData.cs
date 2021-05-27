@@ -7,21 +7,13 @@ using MLAPI.Messaging;
 
 public class PlayerData : NetworkBehaviour
 {
-    public int catcherId;
+    //public int catcherId;
+    public NetworkVariableInt catcherId = new NetworkVariableInt(0);
     public bool isCatcher;
 
-    public int GetCatcherId()
-    {
-        return catcherId;
-    }
 
-    public void SetIsCatcher(bool isCatcher)
+    public void Test()
     {
-        this.isCatcher = isCatcher;
-    }
-
-    public bool GetIsCatcher()
-    {
-        return isCatcher;
+        Debug.Log("Meine ID: " + catcherId.Value);
     }
 }

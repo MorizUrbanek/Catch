@@ -8,18 +8,10 @@ public class Timer : NetworkBehaviour
     public float[] timePerPlayer = new float[6];
     bool gameStarted = true;
     static int catcherId = 0;
-    static Timer instance;
 
-    public static Timer GetInstance()
+    public static void SetCatcherId(int id)
     {
-        if(instance == null)
-        {
-            return instance = new Timer();
-        }
-        else
-        {
-            return instance;
-        }
+        catcherId = id;
     }
 
     // Update is called once per frame
@@ -29,7 +21,7 @@ public class Timer : NetworkBehaviour
 
         if (gameStarted)
         {
-            timePerPlayer[0] += Time.deltaTime;
+            timePerPlayer[catcherId] += Time.deltaTime;
         }
     }
 }
