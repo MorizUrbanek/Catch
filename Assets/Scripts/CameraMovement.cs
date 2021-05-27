@@ -5,6 +5,8 @@ using UnityEngine;
 public class CameraMovement : MonoBehaviour
 {
     public float rotationSpeed = 1;
+    float joyStickSpeedVertical = 13;
+    float joyStickSpeedHorizontal = 8;
     public Transform direction, body;
     public Gun gun;
     float mouseX, mouseY;
@@ -22,9 +24,13 @@ public class CameraMovement : MonoBehaviour
 
     void CamControl()
     {
-        mouseX += Input.GetAxis("Mouse X") * rotationSpeed;
-        mouseY -= Input.GetAxis("Mouse Y") * rotationSpeed;
-        mouseY = Mathf.Clamp(mouseY, -35, 60);
+        mouseX += Input.GetAxisRaw("Mouse X") * rotationSpeed;
+        mouseY -= Input.GetAxisRaw("Mouse Y") * rotationSpeed;
+
+        mouseX += Input.GetAxisRaw("CameraVertical") * joyStickSpeedVertical;
+        mouseY -= Input.GetAxisRaw("CameraHorizontal") * joyStickSpeedHorizontal;
+
+        mouseY = Mathf.Clamp(mouseY, -55, 75);
 
         transform.rotation = Quaternion.Euler(mouseY, mouseX, 0);
         if (gun.isAiming)

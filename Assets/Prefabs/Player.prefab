@@ -659,15 +659,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c5a801e1bcaddf488eef005a90bfed5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 8
+  moveSpeed: 12
   movementMultiplier: 10
   airMultiplier: 0.1
-  walkSpeed: 8
-  sprintSpeed: 10
+  walkSpeed: 10
+  sprintSpeed: 12
   acceleration: 10
   jumpForce: 15
   groundDrag: 6
-  airDrag: 0.732
+  airDrag: 0.85
   groundCheck: {fileID: 6141256158419728767}
   headCheck: {fileID: 6141256158912039522}
   groundMask:

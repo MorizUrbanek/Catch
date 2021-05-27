@@ -9,7 +9,7 @@ public class PlayerMovement : NetworkBehaviour
     #region Movement Variablen
     [Header("Movement")]
     Rigidbody rb;
-    public float moveSpeed = 6f;
+    public float moveSpeed = 10f;
     public float movementMultiplier = 10f;
     public float airMultiplier = 0.4f;
     Vector3 moveDirection;
@@ -22,8 +22,8 @@ public class PlayerMovement : NetworkBehaviour
     float playerheight = 2f;
 
     [Header("Sprinting")]
-    public float walkSpeed = 4f;
-    public float sprintSpeed = 6f;
+    public float walkSpeed = 10f;
+    public float sprintSpeed = 12f;
     public float acceleration = 10f;
 
     [Header("Jumping")]
@@ -113,39 +113,35 @@ public class PlayerMovement : NetworkBehaviour
         {
             Jump();
         }
-        if (Input.GetKeyDown(KeyCode.E) && isGrounded && (Mathf.Abs(rb.velocity.x) > 1 || Mathf.Abs(rb.velocity.z) > 1) && !isSliding && !OnSlope() && !gun.isAiming)
+        if (Input.GetButtonDown("Slide") && isGrounded && (Mathf.Abs(rb.velocity.x) > 1 || Mathf.Abs(rb.velocity.z) > 1) && !isSliding && !OnSlope() && !gun.isAiming)
         {
             StartSliding();
         }
 
-        if (Input.GetKeyDown(KeyCode.Mouse1) && !isSliding)
+        //if (Input.GetButtonDown("Fire2") && !isSliding)
+        //{
+        //    gun.SetIsAiming(!gun.isAiming);
+        //    body.rotation = direction.rotation;
+        //}
+         
+        if (Input.GetButton("Fire2") && !isSliding)
         {
-            gun.SetIsAiming(!gun.isAiming);
-            body.rotation = direction.rotation;
-            //if (!gun.isAiming)
-            //{
-            //    gun.isPulling = false;
-            //}
+            if (!isSliding)
+            {
+                if (!gun.isAiming)
+                {
+                    gun.SetIsAiming(true);
+                    body.rotation = direction.rotation;
+                }
+            }
         }
-
-        //if (Input.GetKey(KeyCode.Mouse1))
-        //{
-        //    if (!isSliding)
-        //    {
-        //        if (!gun.isAiming)
-        //        {
-        //            gun.SetIsAiming(true);
-        //            body.rotation = direction.rotation;
-        //        }
-        //    }
-        //}
-        //else
-        //{
-        //    if (gun.isAiming)
-        //    {
-        //        gun.SetIsAiming(false);
-        //    }
-        //}
+        else
+        {
+            if (gun.isAiming)
+            {
+                gun.SetIsAiming(false);
+            }
+        }
 
         slopeDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
     }
@@ -347,7 +343,7 @@ public class PlayerMovement : NetworkBehaviour
             if (rb.useGravity){rb.useGravity = false;} 
             rb.velocity = Vector3.zero;
             Vector3 hookShotDirection = (gun.pullPoint - transform.position).normalized;
-            float hookShotSpeed = Mathf.Clamp(Vector3.Distance(transform.position, gun.pullPoint), 10, 70);
+            float hookShotSpeed = Mathf.Clamp(Vector3.Distance(transform.position, gun.pullPoint), 10, 50);
             float hookShotSpeedMultiplier = 2f;
 
             rb.MovePosition(transform.position + hookShotDirection * hookShotSpeed * hookShotSpeedMultiplier * Time.fixedDeltaTime);
@@ -357,7 +353,8 @@ public class PlayerMovement : NetworkBehaviour
             if (Vector3.Distance(transform.position, gun.pullPoint) < reachedHookShotPositionDistance
                 || Vector3.Distance(groundCheck.position, gun.pullPoint) < reachedHookShotPositionDistance
                 || Vector3.Distance(new Vector3(transform.position.x, transform.position.y + 1.5f, transform.position.z), gun.pullPoint) < reachedHookShotPositionDistance
-                || isWallFront)
+                || isWallFront
+                || isHeadOnwall)
             {
                 gun.isPulling = false;
                 //rb.velocity = Vector3.zero;
