@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
+using MLAPI;
 
-public class Gun : MonoBehaviour
+
+public class Gun : NetworkBehaviour
 {
     public GameObject mainCam;
     public GameObject aimCam;
@@ -18,6 +20,16 @@ public class Gun : MonoBehaviour
     private float range = 100f;
     private float fireCooldown = .5f;
     private float fireCooldownend = 0;
+
+    private CatchPlayer catchPlayer;
+
+    private void Start()
+    {
+        if (IsLocalPlayer)
+        {
+            catchPlayer = gameObject.GetComponentInParent<CatchPlayer>();
+        }
+    }
 
     // Update is called once per frame
     void Update()
@@ -53,6 +65,15 @@ public class Gun : MonoBehaviour
 
     public void SetIsAiming(bool value)
     {
+        if (IsLocalPlayer)
+        {
+            if(catchPlayer.isActuallyAttacker == false)
+            {
+                isAiming = false;
+                return;
+            }
+        }
+
         isAiming = value;
         mainCam.SetActive(!isAiming);
         aimCam.SetActive(isAiming);

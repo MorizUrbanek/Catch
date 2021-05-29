@@ -197,7 +197,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 639136fa9c82d5f4f9456698e5b2ca05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  catcherId: 0
+  catcherId:
+    m_InternalValue: 0
   isCatcher: 0
 --- !u!1 &6141256157868084567
 GameObject:
@@ -1131,6 +1132,7 @@ MonoBehaviour:
   direction: {fileID: 6141256157987280381}
   body: {fileID: 6141256157736314108}
   gun: {fileID: 6141256158671192831}
+  catchPlayer: {fileID: 3779700619543947767}
 --- !u!114 &6141256159220199211
 MonoBehaviour:
   m_ObjectHideFlags: 0

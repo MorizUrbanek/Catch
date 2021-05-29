@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using MLAPI;
 
-public class CameraMovement : MonoBehaviour
+public class CameraMovement : NetworkBehaviour
 {
     public float rotationSpeed = 1;
     float joyStickSpeedVertical = 13;
@@ -10,7 +11,9 @@ public class CameraMovement : MonoBehaviour
     public Transform direction, body;
     public Gun gun;
     float mouseX, mouseY;
-    
+
+    public CatchPlayer catchPlayer;
+
 
     private void Start()
     {
@@ -35,9 +38,11 @@ public class CameraMovement : MonoBehaviour
         transform.rotation = Quaternion.Euler(mouseY, mouseX, 0);
         if (gun.isAiming)
         {
-            body.rotation = Quaternion.Euler(0, mouseX, 0);
+            if (catchPlayer.isActuallyAttacker && IsLocalPlayer)
+            {
+                body.rotation = Quaternion.Euler(0, mouseX, 0);
+            }
         }
-
         direction.rotation = Quaternion.Euler(0, mouseX, 0);
     }
 }

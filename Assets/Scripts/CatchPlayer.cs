@@ -40,6 +40,16 @@ public class CatchPlayer : NetworkBehaviour
         }
     }
 
+    public void DisableGun()
+    {
+
+    }
+
+    public void EnableGun()
+    {
+        
+    }
+
     public void Released()
     {
         if (isActuallyAttacker)
