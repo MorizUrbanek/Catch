@@ -24,11 +24,6 @@ public class Timer : NetworkBehaviour
         catcherId = id;
     }
 
-    private void Start()
-    {
-        
-    }
-
     // Update is called once per frame
     void Update()
     {
@@ -76,7 +71,7 @@ public class Timer : NetworkBehaviour
 
         for(int i = 6 - playerCount; i < timePerPlayer.Length; i++)
         {
-            playerRanking.Append($"Time: {timePerPlayer[i].ToString(".00")} \n");
+            playerRanking.Append($"Time: {timePerPlayer[i].ToString("0.00")} \n");
         }
     }
 

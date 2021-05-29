@@ -77,6 +77,7 @@ public class CatchPlayerCheck : NetworkBehaviour
         {
             int id = catched.transform.GetComponent<PlayerData>().catcherId.Value;
             Debug.Log(id);
+            //TODO: Add Player username
             Timer.SetCatcherId(id);
             catchedPlayer.Catched();
             gameObject.GetComponent<CatchPlayer>().Released();
