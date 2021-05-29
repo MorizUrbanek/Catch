@@ -4,6 +4,7 @@ using UnityEngine;
 using MLAPI;
 using System;
 using System.Text;
+using MLAPI.Messaging;
 
 public class Timer : NetworkBehaviour
 {
@@ -16,8 +17,7 @@ public class Timer : NetworkBehaviour
     private float roundTime = 0.5f;
     private float timePassed = 0f;
 
-    private TextManager text;
-    private GameObject notificationCanvas;
+    PrintManager printManager;
 
     public static void SetCatcherId(int id)
     {
@@ -26,13 +26,17 @@ public class Timer : NetworkBehaviour
 
     private void Start()
     {
-        notificationCanvas = GameObject.Find("Notifications");
-        text = notificationCanvas.GetComponentInChildren<TextManager>();
+        
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(playerCount > 0)
+        {
+            printManager = GameObject.Find("List").GetComponent<PrintManager>();
+        }
+
         if (!IsServer) { return; }
         playerCount = NetworkManager.Singleton.ConnectedClients.Count;
 
@@ -46,6 +50,7 @@ public class Timer : NetworkBehaviour
             EndGame();
         }
     }
+
 
     StringBuilder playerRanking = new StringBuilder();
     private void UpdateGlobalTime()
@@ -62,8 +67,7 @@ public class Timer : NetworkBehaviour
 
     private void PrintPlayerScore()
     {
-        Debug.Log(playerRanking.ToString());
-        text.ChangeText(playerRanking.ToString());
+        printManager.PrintTextClientRpc(playerRanking.ToString());
     }
 
     private void SortPlayerScore()
