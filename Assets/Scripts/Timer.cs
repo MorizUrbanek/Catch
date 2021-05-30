@@ -5,6 +5,8 @@ using MLAPI;
 using System;
 using System.Text;
 using MLAPI.Messaging;
+using MLAPI.NetworkVariable;
+using MLAPI.Connection;
 
 public class Timer : NetworkBehaviour
 {
@@ -14,19 +16,27 @@ public class Timer : NetworkBehaviour
     bool gameRunning = false, gameOver = false;
 
     public int playerCount;
-    private float roundTime = 8f;
+    private float roundTime = 0.1f;
     private float timePassed = 0f;
 
     public GameObject startButton;
     PrintManager printManager;
 
-
-
+    static string[] players = new string[6];
 
     public void StartGame()
     {
         gameRunning = true;
         startButton.SetActive(false);
+
+        foreach(NetworkClient client in NetworkManager.Singleton.ConnectedClientsList)
+        {
+            int id = client.PlayerObject.gameObject.GetComponentInChildren<PlayerData>().catcherId.Value;
+            string name = client.PlayerObject.gameObject.GetComponentInChildren<PlayerData>().username;
+
+            SetPlayers(name, id);
+
+        }
     }
 
     public static void SetCatcherId(int id)
@@ -34,12 +44,26 @@ public class Timer : NetworkBehaviour
         catcherId = id;
     }
 
+    public static void SetPlayers(string name, int id)
+    {
+        Debug.Log(name);
+        players[id] = name;
+    }
+
     // Update is called once per frame
     void Update()
     {
-        if(playerCount > 0)
+        if (playerCount > 0)
         {
             printManager = GameObject.Find("List").GetComponent<PrintManager>();
+        }
+
+        if (playerCount > 1)
+        {
+            if (IsHost)
+            {
+                startButton.SetActive(true);
+            }
         }
 
         if (!IsServer) { return; }
@@ -64,7 +88,7 @@ public class Timer : NetworkBehaviour
         if (timePassed / 60 >= roundTime)
         {
             gameRunning = false;
-            SortPlayerScore();
+            //SortPlayerScore();
             PrintPlayerScore();
             StartNewRound();
         }
@@ -72,17 +96,16 @@ public class Timer : NetworkBehaviour
 
     private void PrintPlayerScore()
     {
+        for (int i = 0; i < timePerPlayer.Length; i++)
+        {
+            playerRanking.Append($"Player {i}: {timePerPlayer[i].ToString("0.00")} \n");
+        }
         printManager.PrintTextClientRpc(playerRanking.ToString());
     }
 
     private void SortPlayerScore()
     {
         Array.Sort(timePerPlayer);
-
-        for(int i = 6 - playerCount; i < timePerPlayer.Length; i++)
-        {
-            playerRanking.Append($"Time: {timePerPlayer[i].ToString("0.00")} \n");
-        }
     }
 
     private void StartNewRound()

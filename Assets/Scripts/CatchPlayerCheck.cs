@@ -31,7 +31,11 @@ public class CatchPlayerCheck : NetworkBehaviour
         if (IsLocalPlayer)
         {
             catchPlayer = gameObject.GetComponent<CatchPlayer>();
-           // timerInstance = GameObject.Find("Timer").GetComponent<Timer>();
+            int id = gameObject.GetComponent<PlayerData>().catcherId.Value;
+            //string username = gameObject.GetComponent<PlayerData>().username;
+            
+            //Timer.SetPlayers(username, id);
+            // timerInstance = GameObject.Find("Timer").GetComponent<Timer>();
         }
     }
 
@@ -48,7 +52,7 @@ public class CatchPlayerCheck : NetworkBehaviour
 
         if (IsLocalPlayer && IsOwner)
         {
-            if (Input.GetKeyDown(KeyCode.F) && catchPlayer.GetIsAttacker())
+            if (Input.GetButton("Catch") && catchPlayer.GetIsAttacker())
             {
                 Debug.Log("catched");
                 CatchPlayerServerRpc();
@@ -76,9 +80,9 @@ public class CatchPlayerCheck : NetworkBehaviour
         if (catchedPlayer != null)
         {
             int id = catched.transform.GetComponent<PlayerData>().catcherId.Value;
-            Debug.Log(id);
-            //TODO: Add Player username
+            //string username = catched.transform.GetComponent<PlayerData>().username.Value;
             Timer.SetCatcherId(id);
+            //Timer.SetPlayers(username, id);
             catchedPlayer.Catched();
             gameObject.GetComponent<CatchPlayer>().Released();
             return true;

@@ -4,13 +4,14 @@ using UnityEngine;
 using MLAPI;
 using MLAPI.Spawning;
 using MLAPI.Transports.PhotonRealtime;
+using MLAPI.Messaging;
 
 public class ConnectionManager : MonoBehaviour
 {
     public GameObject connectionButtonPanel;
     private int playerCount;
     PlayerData player;
-    string username;
+    public string username;
 
     public void Host()
     {
@@ -26,7 +27,7 @@ public class ConnectionManager : MonoBehaviour
         callback(true, null, approve, GetRandomSpawn(), Quaternion.identity);
         if (approve)
         {
-            InitPlayerData(clientId);
+           InitPlayerData(clientId);
         }
     }
 
@@ -37,9 +38,8 @@ public class ConnectionManager : MonoBehaviour
 
         if (player != null)
         {
+            Debug.Log("Hallo");
             player.catcherId.Value = playerCount - 1;
-            player.username = username;
-            //player.Test();
         }
     }
 
@@ -53,8 +53,8 @@ public class ConnectionManager : MonoBehaviour
 
     public void UpdateUsername(string newName)
     {
+        Debug.Log(newName);
         username = newName;
-        Debug.Log(username);
     }
 
     public void Client()
