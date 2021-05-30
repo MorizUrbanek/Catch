@@ -48,7 +48,7 @@ public class CatchPlayerCheck : NetworkBehaviour
 
         if (IsLocalPlayer && IsOwner)
         {
-            if (Input.GetKeyDown(KeyCode.G) && catchPlayer.GetIsAttacker())
+            if (Input.GetKeyDown(KeyCode.F) && catchPlayer.GetIsAttacker())
             {
                 Debug.Log("catched");
                 CatchPlayerServerRpc();
