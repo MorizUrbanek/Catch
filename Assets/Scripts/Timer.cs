@@ -13,18 +13,21 @@ public class Timer : NetworkBehaviour
     public float[] timePerPlayer = new float[6];
     bool gameRunning = false, gameOver = false;
 
+    public int playerCount;
+    private float roundTime = 8f;
+    private float timePassed = 0f;
+
+    public GameObject startButton;
+    PrintManager printManager;
+
+
+
 
     public void StartGame()
     {
         gameRunning = true;
+        startButton.SetActive(false);
     }
-
-
-    public int playerCount;
-    private float roundTime = 0.5f;
-    private float timePassed = 0f;
-
-    PrintManager printManager;
 
     public static void SetCatcherId(int id)
     {
