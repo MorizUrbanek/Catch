@@ -98,7 +98,7 @@ public class Timer : NetworkBehaviour
     {
         for (int i = 0; i < timePerPlayer.Length; i++)
         {
-            playerRanking.Append($"Player {i}: {timePerPlayer[i].ToString("0.00")} \n");
+            playerRanking.Append($"Player {i + 1}: {timePerPlayer[i].ToString("0.00")} \n");
         }
         printManager.PrintTextClientRpc(playerRanking.ToString());
     }

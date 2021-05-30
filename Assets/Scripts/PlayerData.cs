@@ -22,7 +22,7 @@ public class PlayerData : NetworkBehaviour
     {
         if (IsLocalPlayer)
         {
-            textManager.ChangeText("Player " + catcherId.Value + 1);
+            textManager.ChangeText("Player " + (catcherId.Value + 1));
         }
     }
 }
