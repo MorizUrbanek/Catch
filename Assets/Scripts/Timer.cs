@@ -11,7 +11,14 @@ public class Timer : NetworkBehaviour
     static int catcherId = 0;
 
     public float[] timePerPlayer = new float[6];
-    bool gameRunning = true, gameOver = false;
+    bool gameRunning = false, gameOver = false;
+
+
+    public void StartGame()
+    {
+        gameRunning = true;
+    }
+
 
     public int playerCount;
     private float roundTime = 0.5f;
