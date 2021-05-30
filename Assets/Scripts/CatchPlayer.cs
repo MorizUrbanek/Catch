@@ -12,6 +12,7 @@ public class CatchPlayer : NetworkBehaviour
     public NetworkVariableBool isAttacker = new NetworkVariableBool(false);
     public bool isActuallyAttacker = false;
     public MeshRenderer playerColor;
+    public Gun gun;
 
     public bool GetIsAttacker()
     {
@@ -55,6 +56,7 @@ public class CatchPlayer : NetworkBehaviour
         if (isActuallyAttacker)
         {
             isAttacker.Value = false;
+            gun.SetIsAiming(false);
         }
     }
 }

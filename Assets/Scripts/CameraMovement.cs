@@ -6,8 +6,8 @@ using MLAPI;
 public class CameraMovement : NetworkBehaviour
 {
     public float rotationSpeed = 1;
-    float joyStickSpeedVertical = 13;
-    float joyStickSpeedHorizontal = 8;
+    float joyStickSpeedVertical = 16;
+    float joyStickSpeedHorizontal = 10;
     public Transform direction, body;
     public Gun gun;
     float mouseX, mouseY;

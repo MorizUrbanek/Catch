@@ -42,7 +42,7 @@ public class Gun : NetworkBehaviour
 
     void Shoot()
     {
-        fireCooldownend += fireCooldown;
+        fireCooldownend =Time.time + fireCooldown;
         RaycastHit hit;
         Ray ray = rayCam.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit, range))
@@ -70,12 +70,13 @@ public class Gun : NetworkBehaviour
             if(catchPlayer.isActuallyAttacker == false)
             {
                 isAiming = false;
-                return;
             }
+            else
+            {
+                isAiming = value;
+            }
+            mainCam.SetActive(!isAiming);
+            aimCam.SetActive(isAiming);
         }
-
-        isAiming = value;
-        mainCam.SetActive(!isAiming);
-        aimCam.SetActive(isAiming);
     }
 }

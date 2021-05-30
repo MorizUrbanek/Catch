@@ -32,7 +32,7 @@ public class PlayerMovement : NetworkBehaviour
     [Header("Sliding")]
     float slideTime = .5f;
     bool isSliding = false;
-    float slidingCooldown = 3f;
+    float slidingCooldown = 1.5f;
     float slidingCooldownendtime = 0;
     Vector3 slidingDirection;
 
@@ -56,6 +56,7 @@ public class PlayerMovement : NetworkBehaviour
 
     [Header("Gun Pulling")]
     public Gun gun;
+    public CatchPlayer catchPlayer;
 
     #endregion
 
@@ -126,7 +127,7 @@ public class PlayerMovement : NetworkBehaviour
         //    body.rotation = direction.rotation;
         //}
          
-        if (Input.GetButton("Fire2") && !isSliding)
+        if (Input.GetButton("Fire2") && catchPlayer.isActuallyAttacker)
         {
             if (!isSliding)
             {
@@ -151,6 +152,7 @@ public class PlayerMovement : NetworkBehaviour
     #region Sliding
     void StartSliding()
     {
+        slidingCooldownendtime = Time.time + slidingCooldown;
         isSliding = true;
         body.rotation = Quaternion.Euler(-80, 0, 0);
         slidingDirection = moveDirection;
@@ -159,7 +161,6 @@ public class PlayerMovement : NetworkBehaviour
 
     void EndSliding()
     {
-        slidingCooldownendtime += slidingCooldown;
         isSliding = false;
         body.rotation = Quaternion.Euler(0, 0, 0);
     }
@@ -260,7 +261,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         isWallLeft = Physics.BoxCast(wallCheck.position, new Vector3(0.1f, 0.7f, 0.1f), -body.right, out leftWallHit, body.rotation, wallDistance, walllayer);
         isWallRight = Physics.BoxCast(wallCheck.position, new Vector3(0.1f, 0.7f, 0.1f), body.right, out rightWallHit, body.rotation, wallDistance, walllayer);
-        isWallFront = Physics.BoxCast(body.position, new Vector3(0.1f, 0.95f, 0.1f), body.forward, out frontWallHit, body.rotation, wallDistance, walllayer);
+        isWallFront = Physics.BoxCast(body.position, new Vector3(0.3f, 0.95f, 0.1f), body.forward, out frontWallHit, body.rotation, wallDistance, walllayer);
         isWallBack = Physics.BoxCast(wallCheck.position, new Vector3(0.1f, 0.7f, 0.1f), -body.forward, out backWallHit, body.rotation, wallDistance, walllayer);
     }
 
@@ -357,7 +358,8 @@ public class PlayerMovement : NetworkBehaviour
                 || Vector3.Distance(groundCheck.position, gun.pullPoint) < reachedHookShotPositionDistance
                 || Vector3.Distance(new Vector3(transform.position.x, transform.position.y + 1.5f, transform.position.z), gun.pullPoint) < reachedHookShotPositionDistance
                 || isWallFront
-                || isHeadOnwall)
+                || isHeadOnwall
+                || isWallLeft || isWallRight)
             {
                 gun.isPulling = false;
                 //rb.velocity = Vector3.zero;
@@ -372,7 +374,7 @@ public class PlayerMovement : NetworkBehaviour
         MovePlayer();
         if (rb.useGravity)
         {
-            rb.AddForce(Physics.gravity * rb.mass);
+            rb.AddForce(Physics.gravity * rb.mass * 1.5f);
         }
 
         if (currentDirection != Vector3.zero && !gun.isAiming)
@@ -454,12 +456,12 @@ public class PlayerMovement : NetworkBehaviour
         if (isWallFront)
         {
             Gizmos.color = Color.green;
-            Gizmos.DrawWireCube(body.position + body.forward * wallDistance, new Vector3(0.2f, 0.95f * 2, 0.2f));
+            Gizmos.DrawWireCube(body.position + body.forward * wallDistance, new Vector3(0.6f, 0.95f * 2, 0.2f));
         }
         else
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireCube(body.position + body.forward * wallDistance, new Vector3(0.2f, 0.95f * 2, 0.2f));
+            Gizmos.DrawWireCube(body.position + body.forward * wallDistance, new Vector3(0.6f, 0.95f * 2, 0.2f));
         }
 
         if (isWallBack)
