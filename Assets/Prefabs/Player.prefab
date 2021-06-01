@@ -1248,6 +1248,7 @@ MonoBehaviour:
   isAiming: 0
   isPulling: 0
   pullPoint: {x: 0, y: 0, z: 0}
+  rope: {fileID: 7125764839596880902, guid: aafc2cd659223f74bbe11a721195e745, type: 3}
 --- !u!1 &6141256158912039521
 GameObject:
   m_ObjectHideFlags: 0

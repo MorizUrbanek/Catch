@@ -261,7 +261,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         isWallLeft = Physics.BoxCast(wallCheck.position, new Vector3(0.1f, 0.7f, 0.1f), -body.right, out leftWallHit, body.rotation, wallDistance, walllayer);
         isWallRight = Physics.BoxCast(wallCheck.position, new Vector3(0.1f, 0.7f, 0.1f), body.right, out rightWallHit, body.rotation, wallDistance, walllayer);
-        isWallFront = Physics.BoxCast(body.position, new Vector3(0.3f, 0.95f, 0.1f), body.forward, out frontWallHit, body.rotation, wallDistance, walllayer);
+        isWallFront = Physics.BoxCast(body.position, new Vector3(0.1f, 0.95f, 0.1f), body.forward, out frontWallHit, body.rotation, wallDistance, walllayer);
         isWallBack = Physics.BoxCast(wallCheck.position, new Vector3(0.1f, 0.7f, 0.1f), -body.forward, out backWallHit, body.rotation, wallDistance, walllayer);
     }
 
@@ -347,11 +347,11 @@ public class PlayerMovement : NetworkBehaviour
             if (rb.useGravity){rb.useGravity = false;} 
             rb.velocity = Vector3.zero;
             Vector3 hookShotDirection = (gun.pullPoint - transform.position).normalized;
-            float hookShotSpeed = Mathf.Clamp(Vector3.Distance(transform.position, gun.pullPoint), 10, 50);
-            float hookShotSpeedMultiplier = 2f;
+            float hookShotSpeed = Mathf.Clamp(Vector3.Distance(transform.position, gun.pullPoint), 20, 100);
+            float hookShotSpeedMultiplier = 75f;
 
-            rb.MovePosition(transform.position + hookShotDirection * hookShotSpeed * hookShotSpeedMultiplier * Time.fixedDeltaTime);
-
+            //rb.MovePosition(transform.position + hookShotDirection * hookShotSpeed * hookShotSpeedMultiplier * Time.fixedDeltaTime);
+            rb.AddForce(hookShotDirection * hookShotSpeed * hookShotSpeedMultiplier, ForceMode.Acceleration);
             float reachedHookShotPositionDistance = 0.6f;
 
             if (Vector3.Distance(transform.position, gun.pullPoint) < reachedHookShotPositionDistance
@@ -456,12 +456,12 @@ public class PlayerMovement : NetworkBehaviour
         if (isWallFront)
         {
             Gizmos.color = Color.green;
-            Gizmos.DrawWireCube(body.position + body.forward * wallDistance, new Vector3(0.6f, 0.95f * 2, 0.2f));
+            Gizmos.DrawWireCube(body.position + body.forward * wallDistance, new Vector3(0.2f, 0.95f * 2, 0.2f));
         }
         else
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireCube(body.position + body.forward * wallDistance, new Vector3(0.6f, 0.95f * 2, 0.2f));
+            Gizmos.DrawWireCube(body.position + body.forward * wallDistance, new Vector3(0.2f, 0.95f * 2, 0.2f));
         }
 
         if (isWallBack)

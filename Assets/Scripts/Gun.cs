@@ -15,6 +15,8 @@ public class Gun : NetworkBehaviour
     [HideInInspector]
     public bool isAiming = false;
     public bool isPulling = false;
+    bool isShootingRope = false;
+    float RopeSpeed = 5f;
     public Vector3 pullPoint;
 
     private float range = 100f;
@@ -22,12 +24,16 @@ public class Gun : NetworkBehaviour
     private float fireCooldownend = 0;
 
     private CatchPlayer catchPlayer;
+    [SerializeField] private GameObject rope;
+    LineRenderer lineR;
+    GameObject ropeEffect;
 
     private void Start()
     {
         if (IsLocalPlayer)
         {
             catchPlayer = gameObject.GetComponentInParent<CatchPlayer>();
+            SpawnRope();
         }
     }
 
@@ -38,11 +44,26 @@ public class Gun : NetworkBehaviour
         {
             Shoot();
         }
+
+        if (isShootingRope)
+        {
+            lineR.SetPosition(1, pullPoint);
+            isPulling = true;
+            isShootingRope = false;
+        }
+        else if (isPulling)
+        {
+            lineR.SetPosition(0, transform.position);
+        }
+        else
+        {
+            ropeEffect.SetActive(false);
+        }
     }
 
     void Shoot()
     {
-        fireCooldownend =Time.time + fireCooldown;
+        fireCooldownend = Time.time + fireCooldown;
         RaycastHit hit;
         Ray ray = rayCam.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out hit, range))
@@ -57,10 +78,24 @@ public class Gun : NetworkBehaviour
             else if (hit.transform.CompareTag("Wall"))
             {
                 pullPoint = hit.point;
-                isPulling = true;
+                ropeEffect.SetActive(true);
+                isShootingRope = true;
+                //isPulling = true;
             }
 
         }
+    }
+
+    private void SpawnRope()
+    {
+        ropeEffect = Instantiate(rope, Vector3.zero, Quaternion.identity);
+
+        lineR = ropeEffect.GetComponent<LineRenderer>();
+
+        lineR.SetPosition(0, transform.position);
+        lineR.SetPosition(1, transform.position);
+
+        ropeEffect.SetActive(false);
     }
 
     public void SetIsAiming(bool value)
