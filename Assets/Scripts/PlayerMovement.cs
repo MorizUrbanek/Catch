@@ -147,6 +147,11 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         slopeDirection = Vector3.ProjectOnPlane(moveDirection, slopeHit.normal);
+
+        if (Mathf.Abs(body.rotation.eulerAngles.x) > 10 && !isSliding)
+        {
+            body.rotation = Quaternion.Euler(0, body.rotation.eulerAngles.y, body.rotation.eulerAngles.z);
+        }
     }
 
     #region Sliding
@@ -348,7 +353,7 @@ public class PlayerMovement : NetworkBehaviour
             rb.velocity = Vector3.zero;
             Vector3 hookShotDirection = (gun.pullPoint - transform.position).normalized;
             float hookShotSpeed = Mathf.Clamp(Vector3.Distance(transform.position, gun.pullPoint), 20, 100);
-            float hookShotSpeedMultiplier = 75f;
+            float hookShotSpeedMultiplier = 80f;
 
             //rb.MovePosition(transform.position + hookShotDirection * hookShotSpeed * hookShotSpeedMultiplier * Time.fixedDeltaTime);
             rb.AddForce(hookShotDirection * hookShotSpeed * hookShotSpeedMultiplier, ForceMode.Acceleration);

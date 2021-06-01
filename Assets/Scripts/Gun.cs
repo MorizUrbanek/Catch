@@ -40,24 +40,27 @@ public class Gun : NetworkBehaviour
     // Update is called once per frame
     void Update()
     {
-        if ((Input.GetButtonDown("Fire1") || Input.GetAxis("Fire1") > 0) && isAiming && Time.time > fireCooldownend)
+        if (IsLocalPlayer)
         {
-            Shoot();
-        }
+            if ((Input.GetButtonDown("Fire1") || Input.GetAxis("Fire1") > 0) && isAiming && Time.time > fireCooldownend)
+            {
+                Shoot();
+            }
 
-        if (isShootingRope)
-        {
-            lineR.SetPosition(1, pullPoint);
-            isPulling = true;
-            isShootingRope = false;
-        }
-        else if (isPulling)
-        {
-            lineR.SetPosition(0, transform.position);
-        }
-        else
-        {
-            ropeEffect.SetActive(false);
+            if (isShootingRope)
+            {
+                lineR.SetPosition(1, pullPoint);
+                isPulling = true;
+                isShootingRope = false;
+            }
+            else if (isPulling)
+            {
+                lineR.SetPosition(0, transform.position);
+            }
+            else if (ropeEffect.activeSelf)
+            {
+                ropeEffect.SetActive(false);
+            }
         }
     }
 
